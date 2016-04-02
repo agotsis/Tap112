@@ -9,7 +9,9 @@ import time
 from scipy.io.wavfile import read
 
 #setting our sound files
-wavFile = "bin/SMB.wav"
+wavFile = "bin/MbotSet.wav"
+#wavFile = "bin/SMB.wav"
+
 msDelay = 75
 
 travelDelay = 2000
