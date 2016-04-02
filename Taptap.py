@@ -1,6 +1,8 @@
 from __future__ import division,print_function
 from visual import *
 import copy
+from VPSound import *
+import thread
 
 zLength = 50
 border = 0
@@ -127,7 +129,7 @@ def checkHit():
     global notes
     global note
     global keynotes
-    
+    global score
     for no in notes:
         if(len(note) != 0):
             for i in range(len(notes[no])):
@@ -165,6 +167,8 @@ pause = False
 
 scene.bind("keydown",keyPressed)
 scene.bind("keyup",keyReleased)
+
+thread.start_new_thread(playsound,("SMBcut.wav",))
 
 ### Advancing and deleting the text ###
 while advance:
