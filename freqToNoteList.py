@@ -1,6 +1,7 @@
 from __future__ import division,print_function
-import noteDictionary
-import BasicFFT
+from noteDictionary import *
+#from scipy.io.wavfile import read
+from BasicFFT import *
 
 #create a function that takes a list of frequencies and returns a list of notes
 #assumes findNote(freq) converts a float freq to a string note
@@ -16,5 +17,7 @@ def freqToNoteList(freqList):
         result.append(subResult)
     return result
 
-freqList = maxFFT("420+700Hz.wav")
-print(freqToNoteList(freqList))
+#rate, data = read("SMBcut.wav")
+
+#freqList = intervalFFT(rate,data,250)
+#print(freqToNoteList(freqList))
