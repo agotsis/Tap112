@@ -130,20 +130,21 @@ def checkHit():
     
     for no in notes:
         if(len(note) != 0):
-            for i in range(len(notes[note])):
-                pt = notes[note][i]
-                #print(pt)
-                if(pt == note):
-                    print(pt.pos.z)
-            
-                if(pt == note and (zLength-3 >= pt.pos.z >= zLength-12)):
-                    print(pt.pos.z)
-                    print(no)
+            for i in range(len(notes[no])):
+                pt = notes[no][i]
+                if(no == note and (zLength-3 >= pt.pos.z >= zLength-12)):
                     pt.visible = False
+                    score += 1
                     notes[note].pop(i)
+                    drawScore()
                     return                   
+score = 0
+scoretext = text(text=str(score), pos = (40,50,0),
+    align='center', depth=-0.3, color=color.green)
 
-    pass
+def drawScore():
+    global score 
+    scoretext.text = str(score)
 
 scene.autoscale=False
 scene.userzoom = False
