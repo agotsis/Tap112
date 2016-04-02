@@ -2,8 +2,6 @@ from __future__ import division,print_function
 from visual import *
 import copy
 
-#http://vpython.org/contents/docs/materials.html
-
 zLength = 50
 border = 0
 scene = display(title='Examples of Tetrahedrons',
@@ -13,8 +11,8 @@ scene = display(title='Examples of Tetrahedrons',
 sphere(pos = (0,0,-zLength),radius = 1, color = color.red)
 cylinder(pos = (-21,0,zLength),axis = (-2,0,-zLength*10))
 cylinder(pos = (21,0,zLength),axis = (2,0,-zLength*10))
-#box(pos = (0,0,zLength),length = 50,height = 1,width = 1)
-#box(pos = (0,0,zLength-15),length = 40,height = 1,width = 1)
+box(pos = (0,-0.5,zLength-5),length = 45,height = 0.5,width = 0.5)
+box(pos = (0,-0.5,zLength-10),length = 40,height = 0.5,width = 0.5)
 
 w = 21
 width = 10
@@ -23,6 +21,7 @@ noteScale = {"C": [-17.5,color.white],"D":[-12.5,color.blue],"E":[-7.5,color.whi
              "B":[12.5,color.white],"C1":[17.5,color.blue]}
 Master = copy.deepcopy(noteScale)
 keysticks = dict()
+
 for note in ["C","D","E","F","G","A","B","C1"]:
     x = noteScale[note][0]
     t1 = box(pos=(x,-1,zLength-7.5),size = (4,1,15),radius=1,color=noteScale[note][1])
@@ -57,23 +56,33 @@ scene.lights =[distant_light(direction=(0.5,0.5,0.2))]
 
 def generateNote():
     global note
+    global notes
     if(len(note) != 0):
         x = Master[note][0]
         t1 = sphere(pos=(x,0,-zLength*5),radius=1,color=color.green)
         t1.visible = True
-        notes.add(t1)
+        if(note not in notes):
+            notes[note] = [t1]
+        else:
+            notes[note].append(t1)
 
 def checkBorderLine(notes):
     global zLength
     for note in notes:
-        if note.pos.z > zLength+10:
-            note.visible = False
-            return notes.discard(note)
-
-def moveNotes(notes,vel,dt):
+        for i in range(len(notes[note])):
+            pt = notes[note][i]
+            if pt.pos.z > zLength+10:
+                pt.visible = False
+                notes[note].pop(i)
+                return
+            
+def moveNotes(vel,dt):
+    global notes
     if(len(notes) != 0):
         for note in notes:
-            note.pos.z += vel * dt
+            for i in range(len(notes[note])):
+                pt = notes[note][i]
+                pt.pos.z += vel * dt
 pressed = True
 def keyPressed(evt):
     global note
@@ -109,9 +118,33 @@ def pressKey():
     global keysticks
     global kt
     global dt
-    if(len(note) > 0):
-        keysticks[note].color = color.green
-        generateNote()
+    if(note in "CDEFGABC1"):
+        if(len(note) > 0):
+            keysticks[note].color = color.green
+            generateNote()
+
+def checkHit():
+    global notes
+    global note
+    global keynotes
+    
+    for no in notes:
+        if(len(note) != 0):
+            for i in range(len(notes[note])):
+                pt = notes[note][i]
+                print(pt)
+                if(pt == note):
+                    print(pt.pos.z)
+            
+                if(pt == note and (zLength-3 >= pt.pos.z >= zLength-12)):
+                    print(pt.pos.z)
+                    print(no)
+                    pt.visible = False
+                    notes[note].pop(i)
+                    return                   
+
+    pass
+
 scene.autoscale=False
 scene.userzoom = False
 scene.userspin = False
@@ -120,7 +153,7 @@ scene.range = zLength
 myFrame = frame()
 scene.forward = scene.forward.rotate(angle=-0.2, axis=(1,0,0))
 
-notes = set()
+notes = dict()
 note = ""
 zVelocity=150
 t=0
@@ -136,7 +169,8 @@ scene.bind("keyup",keyReleased)
 while advance:
     rate(500)
     if not pause:
-        moveNotes(notes,zVelocity,dt)
+        moveNotes(zVelocity,dt)
+        checkHit()
         checkBorderLine(notes)
         if(len(notes) ==0):
             pass
