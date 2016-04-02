@@ -3,6 +3,22 @@ from visual import *
 import copy
 from VPSound import *
 import thread
+from freqToNoteList import freqToNoteList
+from BasicFFT import *
+import time
+from scipy.io.wavfile import read
+
+#setting our sound files
+wavFile = "SMB.wav"
+msDelay = 125
+
+travelDelay = 1750
+
+#calculating notes from wav file
+sampleRate,data = read(wavFile)
+notesList = freqToNoteList(intervalFFT(sampleRate,data,msDelay))
+
+#animations
 
 zLength = 50
 border = 0
@@ -19,12 +35,12 @@ box(pos = (0,-0.5,zLength-10),length = 40,height = 0.5,width = 0.5)
 w = 21
 width = 10
 #keyboard = box(pos=(0,0,zLength),size=(10,1,1),axis=(1,0,0),color = color.white)
-noteScale = {"C": [-17.5,color.white],"D":[-12.5,color.blue],"E":[-7.5,color.white],"F":[-2.5,color.blue],"G":[2.5,color.white],"A":[7.5,color.blue],\
-             "B":[12.5,color.white],"C1":[17.5,color.blue]}
+noteScale = {"c": [-17.5,color.white],"d":[-12.5,color.blue],"e":[-7.5,color.white],"f":[-2.5,color.blue],"g":[2.5,color.white],"a":[7.5,color.blue],\
+             "b":[12.5,color.white],"C1":[17.5,color.blue]}
 Master = copy.deepcopy(noteScale)
 keysticks = dict()
 
-for note in ["C","D","E","F","G","A","B","C1"]:
+for note in ["c","d","e","f","g","a","b","C1"]:
     x = noteScale[note][0]
     t1 = box(pos=(x,-1,zLength-7.5),size = (4,1,15),radius=1,color=noteScale[note][1])
     t1.visible = True
@@ -34,7 +50,7 @@ def drawKeyBoard():
     global noteScale
     global zLength
 
-    for note in ["C","D","E","F","G","A","B","C1"]:
+    for note in ["c","d","e","f","g","a","b","C1"]:
         x = noteScale[note][0]
         t1 = box(pos=(x,-1,zLength-7.5),size = (4,1,15),radius=1,color=noteScale[note][1])
         t1.visible = True
@@ -43,7 +59,7 @@ def drawRoad():
     global noteScale
     global zLength
     index = 0
-    k = ["C","D","E","F","G","A","B"]
+    k = ["c","d","e","f","g","a","b"]
     for i in range(len(k)):
         note = k[i]
         x = noteScale[note][0]
@@ -56,8 +72,8 @@ def drawRoad():
 drawRoad()
 scene.lights =[distant_light(direction=(0.5,0.5,0.2))]
 
-def generateNote():
-    global note
+def generateNote(note):
+    #note is a string of either "a","b","c",etc.
     global notes
     if(len(note) != 0):
         x = Master[note][0]
@@ -68,6 +84,16 @@ def generateNote():
         else:
             notes[note].append(t1)
 
+def generateNotesFromList(notesList,msDelay):
+    for chord in notesList:
+        #chord is a list of notes
+        chord = set(chord)
+        for note in chord:
+            if note != None:
+                generateNote(note)
+        time.sleep(msDelay/1000)
+                
+
 def checkBorderLine(notes):
     global zLength
     for note in notes:
@@ -75,6 +101,7 @@ def checkBorderLine(notes):
             pt = notes[note][i]
             if pt.pos.z > zLength+10:
                 pt.visible = False
+                del pt
                 notes[note].pop(i)
                 return
             
@@ -85,23 +112,24 @@ def moveNotes(vel,dt):
             for i in range(len(notes[note])):
                 pt = notes[note][i]
                 pt.pos.z += vel * dt
+                
 pressed = True
 def keyPressed(evt):
     global note
-    if (evt.key == "a" or evt.key =="A"):
-        note = "C"
+    if (evt.key == "a" or evt.key =="a"):
+        note = "c"
     elif (evt.key == "s" or evt.key =="S"):
-        note = "D"
-    elif (evt.key == "d" or evt.key =="D"):
-        note = "E"
-    elif (evt.key == "f" or evt.key =="F"):
-        note = "F"
+        note = "d"
+    elif (evt.key == "d" or evt.key =="d"):
+        note = "e"
+    elif (evt.key == "f" or evt.key =="f"):
+        note = "f"
     elif (evt.key == "j" or evt.key =="J"):
-        note = "G"
+        note = "g"
     elif (evt.key == "k" or evt.key =="K"):
-        note = "A"
+        note = "a"
     elif (evt.key == "l" or evt.key =="L"):
-        note = "B"
+        note = "b"
     elif (evt.key == ";"): note = "C1"
     pressKey()
 
@@ -110,7 +138,7 @@ def keyReleased():
     global keysticks
     global Master
     if(len(note) > 0):
-        for n in ["C","D","E","F","G","A","B","C1"]:
+        for n in ["c","d","e","f","g","a","b","C1"]:
             keysticks[n].color = Master[n][1]
         note = ""  
 
@@ -120,10 +148,9 @@ def pressKey():
     global keysticks
     global kt
     global dt
-    if(note in "CDEFGABC1"):
+    if(note in "cdefgabC1"):
         if(len(note) > 0):
             keysticks[note].color = color.green
-            generateNote()
 
 def checkHit():
     global notes
@@ -136,13 +163,14 @@ def checkHit():
                 pt = notes[no][i]
                 if(no == note and (zLength-3 >= pt.pos.z >= zLength-12)):
                     pt.visible = False
-                    score += 1
+                    #score += 1
+                    del pt
                     notes[note].pop(i)
-                    drawScore()
+                    #drawScore()
                     return                   
 score = 0
-scoretext = text(text=str(score), pos = (40,50,0),
-    align='center', depth=-0.3, color=color.green)
+#scoretext = text(text=str(score), pos = (40,50,0),
+  #  align='center', depth=-0.3, color=color.green)
 
 def drawScore():
     global score 
@@ -168,26 +196,26 @@ pause = False
 scene.bind("keydown",keyPressed)
 scene.bind("keyup",keyReleased)
 
-thread.start_new_thread(playsound,("SMBcut.wav",))
+thread.start_new_thread(generateNotesFromList,(notesList,msDelay))
 
+
+
+counter = 0
 ### Advancing and deleting the text ###
 while advance:
     rate(500)
     if not pause:
+        counter +=1
         moveNotes(zVelocity,dt)
         checkHit()
         checkBorderLine(notes)
-        if(len(notes) ==0):
-            pass
         t += dt
-        kt += dt
+        if counter==travelDelay:
+            thread.start_new_thread(playsound,(wavFile,))
     #zBound = scene.mouse.camera.z - (2/tan(scene.fov/2))
-    """
-    if (t1.pos.z > zBound):
-        for obj in myFrame.objects:
-            obj.visible = False
-            del obj
-        advance = not advance"""
+
+
+    
 
 """
 http://www.twitrcovers.com/wp-content/uploads/2014/02/Super-Mario-l.jpg
