@@ -12,7 +12,7 @@ from scipy.io.wavfile import read
 wavFile = "bin/SMB.wav"
 msDelay = 75
 
-travelDelay = 1750
+travelDelay = 2000
 
 #calculating notes from wav file
 sampleRate,data = read(wavFile)
@@ -26,7 +26,6 @@ scene = display(title='Taptap 112',
      x=0, y=0, width=800, height=600,
      center=(0,0,0), background=(0,0,0))
 
-sphere(pos = (0,0,-zLength),radius = 1, color = color.red)
 cylinder(pos = (-21,0,zLength),axis = (-2,0,-zLength*10))
 cylinder(pos = (21,0,zLength),axis = (2,0,-zLength*10))
 box(pos = (0,-0.5,zLength-5),length = 45,height = 0.5,width = 0.5)
@@ -163,17 +162,19 @@ def checkHit():
     global note
     global keynotes
     global score
-    for no in notes:
-        if(len(note) != 0):
-            for i in range(len(notes[no])):
-                pt = notes[no][i]
-                if(no == note and (zLength-3 >= pt.pos.z >= zLength-12)):
-                    pt.visible = False
-                    #score += 1
-                    del pt
-                    notes[note].pop(i)
-                    #drawScore()
-                    return                   
+    global notes_lock
+    with notes_lock:
+        for no in notes:
+            if(len(note) != 0):
+                for i in range(len(notes[no])):
+                    pt = notes[no][i]
+                    if(no == note and (zLength >= pt.pos.z >= zLength-15)):
+                        pt.visible = False
+                        #score += 1
+                        del pt
+                        notes[note].pop(i)
+                        #drawScore()
+                        return                   
 score = 0
 #scoretext = text(text=str(score), pos = (40,50,0),
   #  align='center', depth=-0.3, color=color.green)
