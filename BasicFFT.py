@@ -7,6 +7,13 @@ def basicFFT(rate, dataArray):
     freqSpacing = rate/N
     rawFFT = scipy.fftpack.fft(dataArray)
     positiveFreqs = np.abs(rawFFT[:N//2])
+    return positiveFreqs
+
+def maxFFT(rate, dataArray):
+    N = len(dataArray)
+    freqSpacing = rate/N
+    rawFFT = scipy.fftpack.fft(dataArray)
+    positiveFreqs = np.abs(rawFFT[:N//2])
     maxAmplitude = np.amax(positiveFreqs,axis=0)
     epsilon = 0.05*maxAmplitude
     peakIndex = np.argwhere(abs(positiveFreqs-maxAmplitude)<epsilon)
@@ -23,5 +30,5 @@ def intervalFFT(rate, dataArray, msInterval):
 
     frequencies = []
     for interval in intervals:
-        frequencies.append(basicFFT(rate, interval))
+        frequencies.append(maxFFT(rate, interval))
     return frequencies

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import thread
 import time
 from fileFFT import fileFFT
@@ -16,3 +17,15 @@ def playTaptap(filename):
         thread.start_new_thread(playSound(a))
     except:
         print("Error: unable to start thread!")
+=======
+import scipy.io.wavfile as wavfile
+from BasicFFT import maxFFT, intervalFFT
+
+rate,data = wavfile.read("bin/mixedTest.wav")
+
+print(intervalFFT(rate,data,250))
+
+rate,data = wavfile.read("bin/420+700Hz.wav")
+
+print(maxFFT(rate,data))
+>>>>>>> FFT
