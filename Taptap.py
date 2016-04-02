@@ -132,7 +132,7 @@ def checkHit():
         if(len(note) != 0):
             for i in range(len(notes[note])):
                 pt = notes[note][i]
-                print(pt)
+                #print(pt)
                 if(pt == note):
                     print(pt.pos.z)
             
