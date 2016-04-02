@@ -9,8 +9,8 @@ import time
 from scipy.io.wavfile import read
 
 #setting our sound files
-wavFile = "SMB.wav"
-msDelay = 125
+wavFile = "bin/SMB.wav"
+msDelay = 75
 
 travelDelay = 1750
 
@@ -36,11 +36,11 @@ w = 21
 width = 10
 #keyboard = box(pos=(0,0,zLength),size=(10,1,1),axis=(1,0,0),color = color.white)
 noteScale = {"c": [-17.5,color.white],"d":[-12.5,color.blue],"e":[-7.5,color.white],"f":[-2.5,color.blue],"g":[2.5,color.white],"a":[7.5,color.blue],\
-             "b":[12.5,color.white],"C1":[17.5,color.blue]}
+             "b":[12.5,color.white],"c1":[17.5,color.blue]}
 Master = copy.deepcopy(noteScale)
 keysticks = dict()
 
-for note in ["c","d","e","f","g","a","b","C1"]:
+for note in ["c","d","e","f","g","a","b","c1"]:
     x = noteScale[note][0]
     t1 = box(pos=(x,-1,zLength-7.5),size = (4,1,15),radius=1,color=noteScale[note][1])
     t1.visible = True
@@ -50,7 +50,7 @@ def drawKeyBoard():
     global noteScale
     global zLength
 
-    for note in ["c","d","e","f","g","a","b","C1"]:
+    for note in ["c","d","e","f","g","a","b","c1"]:
         x = noteScale[note][0]
         t1 = box(pos=(x,-1,zLength-7.5),size = (4,1,15),radius=1,color=noteScale[note][1])
         t1.visible = True
@@ -136,7 +136,7 @@ def keyPressed(evt):
         note = "a"
     elif (evt.key == "l" or evt.key =="L"):
         note = "b"
-    elif (evt.key == ";"): note = "C1"
+    elif (evt.key == ";"): note = "c1"
     pressKey()
 
 def keyReleased():
@@ -144,7 +144,7 @@ def keyReleased():
     global keysticks
     global Master
     if(len(note) > 0):
-        for n in ["c","d","e","f","g","a","b","C1"]:
+        for n in ["c","d","e","f","g","a","b","c1"]:
             keysticks[n].color = Master[n][1]
         note = ""  
 
@@ -154,7 +154,7 @@ def pressKey():
     global keysticks
     global kt
     global dt
-    if(note in "cdefgabC1"):
+    if(note in "cdefgabc1"):
         if(len(note) > 0):
             keysticks[note].color = color.green
 
