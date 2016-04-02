@@ -8,8 +8,7 @@ regText = "Let's play typeracer!"
 highText = ""
 t1 = text(frame=myFrame,text=regText,align="center",height=1,depth=-0.2,
           pos=(0,-3,-10),color = color.white)
-t1.visible = True
-highlight = text(frame=myFrame,text=highText,align="left",depth = -0.2,
+t1.visible = True                                                                     highlight = text(frame=myFrame,text=highText,align="left",depth = -0.2,
                  pos=(t1.pos.x-(t1.width/2),t1.pos.y,t1.pos.z),
                  color = color.yellow)
 indexTrack = 0
