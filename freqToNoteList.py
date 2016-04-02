@@ -1,6 +1,6 @@
 from __future__ import division,print_function
 from noteDictionary import *
-from scipy.io.wavfile import read
+#from scipy.io.wavfile import read
 from BasicFFT import *
 
 #create a function that takes a list of frequencies and returns a list of notes
@@ -11,19 +11,13 @@ def freqToNoteList(freqList):
     result = []
     for freqs in freqList:
         subResult = []
-        lastNone = False
         for freq in freqs:
             note = findNote(freq)
-            if note == None and not lastNone:
-                subResult.append(note)
-                lastNone=True
-            elif note != None:
-                subResult.append(note)
-                lastNone = False
+            subResult.append(note)
         result.append(subResult)
     return result
 
-rate, data = read("bin/SMBcut.wav")
+#rate, data = read("SMBcut.wav")
 
-freqList = intervalFFT(rate,data,125)
-print(freqToNoteList(freqList))
+#freqList = intervalFFT(rate,data,250)
+#print(freqToNoteList(freqList))
