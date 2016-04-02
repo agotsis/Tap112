@@ -22,7 +22,7 @@ notesList = freqToNoteList(intervalFFT(sampleRate,data,msDelay))
 
 zLength = 50
 border = 0
-scene = display(title='Examples of Tetrahedrons',
+scene = display(title='Taptap 112',
      x=0, y=0, width=800, height=600,
      center=(0,0,0), background=(0,0,0))
 
@@ -72,17 +72,20 @@ def drawRoad():
 drawRoad()
 scene.lights =[distant_light(direction=(0.5,0.5,0.2))]
 
+#T0
 def generateNote(note):
     #note is a string of either "a","b","c",etc.
     global notes
-    if(len(note) != 0):
-        x = Master[note][0]
-        t1 = sphere(pos=(x,0,-zLength*5),radius=1,color=color.green)
-        t1.visible = True
-        if(note not in notes):
-            notes[note] = [t1]
-        else:
-            notes[note].append(t1)
+    global notes_lock
+    with notes_lock:
+        if(len(note) != 0):
+            x = Master[note][0]
+            t1 = sphere(pos=(x,0,-zLength*5),radius=1,color=color.green)
+            t1.visible = True
+            if(note not in notes):
+                notes[note] = [t1]
+            else:
+                notes[note].append(t1)
 
 def generateNotesFromList(notesList,msDelay):
     for chord in notesList:
@@ -104,14 +107,17 @@ def checkBorderLine(notes):
                 del pt
                 notes[note].pop(i)
                 return
-            
+
+# T1           
 def moveNotes(vel,dt):
     global notes
-    if(len(notes) != 0):
-        for note in notes:
-            for i in range(len(notes[note])):
-                pt = notes[note][i]
-                pt.pos.z += vel * dt
+    global notes_lock
+    with notes_lock:
+        if(len(notes) != 0):
+            for note in notes:
+                for i in range(len(notes[note])):
+                    pt = notes[note][i]
+                    pt.pos.z += vel * dt
                 
 pressed = True
 def keyPressed(evt):
@@ -185,6 +191,7 @@ myFrame = frame()
 scene.forward = scene.forward.rotate(angle=-0.2, axis=(1,0,0))
 
 notes = dict()
+notes_lock = thread.allocate_lock()
 note = ""
 zVelocity=150
 t=0
@@ -197,8 +204,6 @@ scene.bind("keydown",keyPressed)
 scene.bind("keyup",keyReleased)
 
 thread.start_new_thread(generateNotesFromList,(notesList,msDelay))
-
-
 
 counter = 0
 ### Advancing and deleting the text ###
